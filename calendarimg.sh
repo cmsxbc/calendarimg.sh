@@ -12,11 +12,11 @@ CALENDARIMG_ROWS=${CALENDARIMG_ROWS:-7}
 
 CALENDARIMG_SUMMARY_NUMBER=${CALENDARIMG_SUMMARY_NUMBER:-disabled}
 
-declare CALENDARIMG_ITEM_WIDTH CALENDARIMG_TOTAL_WIDTH CALENDARIMG_TOTAL_HEIGTH
+declare CALENDARIMG_ITEM_WIDTH CALENDARIMG_TOTAL_WIDTH CALENDARIMG_TOTAL_HEIGTH CALENDARIMG_TOTAL
 
-CALENDARIMG_COLOR_BG="255 255 255"
-CALENDARIMG_COLOR_BR="0 0 0"
-CALENDARIMG_COLOR_NR="192 0 0"
+CALENDARIMG_COLOR_BG=${CALENDARIMG_COLOR_BG:-"255 255 255"}
+CALENDARIMG_COLOR_BR=${CALENDARIMG_COLOR_BR:-"0 0 0"}
+CALENDARIMG_COLOR_NR=${CALENDARIMG_COLOR_NR:-"192 0 0"}
 
 
 CALENDARIMG_MAJOR=${CALENDARIMG_MAJOR:-row}
@@ -402,10 +402,13 @@ function calendarimg_generate {
         return
     fi
 
-    if [[ $((CALENDARIMG_COLS * CALENDARIMG_ROWS)) -ne 364 ]];then
-        echo "cols * rows != 364" >&2;
+    CALENDARIMG_TOTAL=$((CALENDARIMG_COLS * CALENDARIMG_ROWS))
+
+    if [[ ${#CALENDARIMG_DATA[@]} -ne $CALENDARIMG_TOTAL ]];then
+        echo "data length: ${#CALENDARIMG_DATA[@]} != $CALENDARIMG_TOTAL" >&2;
         return
     fi
+
     calendarimg_init_size
 
 
@@ -426,7 +429,7 @@ function calendarimg_generate {
         row_counts[i]=0
     done
 
-    for cur_index in {0..363}; do
+    for ((cur_index=0;cur_index<CALENDARIMG_TOTAL;cur_index++)); do
         if [[ $CALENDARIMG_MAJOR == "row" ]];then
             cur_col=$((cur_index / CALENDARIMG_ROWS))
             cur_row=$((cur_index % CALENDARIMG_ROWS))
