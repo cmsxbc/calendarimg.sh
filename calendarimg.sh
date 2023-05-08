@@ -10,10 +10,9 @@ CALENDARIMG_MARGIN=${CALENDARIMG_MARGIN:-20}
 CALENDARIMG_COLS=${CALENDARIMG_COLS:-52}
 CALENDARIMG_ROWS=${CALENDARIMG_ROWS:-7}
 
+CALENDARIMG_SUMMARY_NUMBER=${CALENDARIMG_SUMMARY_NUMBER:-disabled}
 
-CALENDARIMG_ITEM_WIDTH=$((CALENDARIMG_CELL_WIDTH + CALENDARIMG_BORDER * 2 + CALENDARIMG_PADDING))
-CALENDARIMG_TOTAL_WIDTH=$((CALENDARIMG_ITEM_WIDTH * (CALENDARIMG_COLS + 2) - CALENDARIMG_PADDING + CALENDARIMG_MARGIN * 2))
-CALENDARIMG_TOTAL_HEIGTH=$((CALENDARIMG_ITEM_WIDTH * (CALENDARIMG_ROWS + 2) - CALENDARIMG_PADDING + CALENDARIMG_MARGIN * 2))
+declare CALENDARIMG_ITEM_WIDTH CALENDARIMG_TOTAL_WIDTH CALENDARIMG_TOTAL_HEIGTH
 
 CALENDARIMG_COLOR_BG="255 255 255"
 CALENDARIMG_COLOR_BR="0 0 0"
@@ -21,6 +20,7 @@ CALENDARIMG_COLOR_NR="192 0 0"
 
 
 CALENDARIMG_MAJOR=${CALENDARIMG_MAJOR:-row}
+
 
 
 declare -a CALENDARIMG_DATA
@@ -356,6 +356,7 @@ function calendarimg_draw_number {
     done
 }
 
+
 function calendarimg_check_colors {
     if [[ -z "${CALENDARIMG_LEVEL_LIMITS[*]}" ]];then
         CALENDARIMG_LEVEL_LIMITS[0]=3
@@ -379,6 +380,18 @@ function calendarimg_check_colors {
 }
 
 
+function calendarimg_init_size {
+    local addition_items
+    addition_items=0
+    if [[ ${CALENDARIMG_SUMMARY_NUMBER^^} == "ENABLED" ]];then
+        addition_items=2
+    fi
+    CALENDARIMG_ITEM_WIDTH=$((CALENDARIMG_CELL_WIDTH + CALENDARIMG_BORDER * 2 + CALENDARIMG_PADDING))
+    CALENDARIMG_TOTAL_WIDTH=$((CALENDARIMG_ITEM_WIDTH * (CALENDARIMG_COLS + addition_items) - CALENDARIMG_PADDING + CALENDARIMG_MARGIN * 2))
+    CALENDARIMG_TOTAL_HEIGTH=$((CALENDARIMG_ITEM_WIDTH * (CALENDARIMG_ROWS + addition_items) - CALENDARIMG_PADDING + CALENDARIMG_MARGIN * 2))
+}
+
+
 function calendarimg_generate {
 
     if [[ -z "$1" ]];then
@@ -393,10 +406,7 @@ function calendarimg_generate {
         echo "cols * rows != 364" >&2;
         return
     fi
-
-    CALENDARIMG_ITEM_WIDTH=$((CALENDARIMG_CELL_WIDTH + CALENDARIMG_BORDER * 2 + CALENDARIMG_PADDING))
-    CALENDARIMG_TOTAL_WIDTH=$((CALENDARIMG_ITEM_WIDTH * (CALENDARIMG_COLS + 2) - CALENDARIMG_PADDING + CALENDARIMG_MARGIN * 2))
-    CALENDARIMG_TOTAL_HEIGTH=$((CALENDARIMG_ITEM_WIDTH * (CALENDARIMG_ROWS + 2) - CALENDARIMG_PADDING + CALENDARIMG_MARGIN * 2))
+    calendarimg_init_size
 
 
     local cur_index cur_row cur_col points row_start_idx col_start_idx w h i j col_counts row_counts color_idx
@@ -454,12 +464,14 @@ function calendarimg_generate {
         done
     done
 
-    for ((i=0;i<CALENDARIMG_COLS;i++));do
-        eval "$(calendarimg_draw_number "${col_counts[i]}" points col $i)"
-    done
-    for ((i=0;i<CALENDARIMG_ROWS;i++));do
-        eval "$(calendarimg_draw_number "${row_counts[i]}" points row $i)"
-    done
+    if [[ ${CALENDARIMG_SUMMARY_NUMBER^^} == "ENABLED" ]];then
+        for ((i=0;i<CALENDARIMG_COLS;i++));do
+            eval "$(calendarimg_draw_number "${col_counts[i]}" points col $i)"
+        done
+        for ((i=0;i<CALENDARIMG_ROWS;i++));do
+            eval "$(calendarimg_draw_number "${row_counts[i]}" points row $i)"
+        done
+    fi
 
     echo -e "P3\n${CALENDARIMG_TOTAL_WIDTH} ${CALENDARIMG_TOTAL_HEIGTH}\n255\n" > "$1"
     for ((h=0;h<CALENDARIMG_TOTAL_HEIGTH;h++));do

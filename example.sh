@@ -5,7 +5,7 @@ source calendarimg.sh
 # CALENDARIMG_MAJOR="row"
 # CALENDARIMG_COLS=14
 # CALENDARIMG_ROWS=26
-
+# CALENDARIMG_SUMMARY_NUMBER="disabled"
 
 for i in {0..363};do
     CALENDARIMG_DATA[i]=$(( i % 7 ));
