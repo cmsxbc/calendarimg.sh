@@ -451,15 +451,16 @@ function calendarimg_generate {
         ((col_counts[cur_col]+=1))
         ((row_counts[cur_row]+=1))
 
+        color_idx=0
+        for ((;color_idx<CALENDARIMG_LAST_LEVEL;color_idx++));do
+            if [[ "${CALENDARIMG_DATA[$cur_index]}" -lt ${CALENDARIMG_LEVEL_LIMITS[$color_idx]} ]];then
+                break;
+            fi
+        done
+
         for ((i=0;i<CALENDARIMG_CELL_WIDTH;i++));do
             for ((j=0;j<CALENDARIMG_CELL_WIDTH;j++));do
-                for ((color_idx=0;color_idx<CALENDARIMG_LAST_LEVEL;color_idx++));do
-                    if [[ "${CALENDARIMG_DATA[$cur_index]}" -lt ${CALENDARIMG_LEVEL_LIMITS[$color_idx]} ]];then
-                        points["$((row_start_idx+CALENDARIMG_BORDER+j)),$((col_start_idx+CALENDARIMG_BORDER+i))"]="${CALENDARIMG_LEVEL_COLORS[$color_idx]}"
-                        continue 2;
-                    fi
-                done
-                points["$((row_start_idx+CALENDARIMG_BORDER+j)),$((col_start_idx+CALENDARIMG_BORDER+i))"]="${CALENDARIMG_LEVEL_COLORS[$CALENDARIMG_LAST_LEVEL]}"
+                points["$((row_start_idx+CALENDARIMG_BORDER+j)),$((col_start_idx+CALENDARIMG_BORDER+i))"]="${CALENDARIMG_LEVEL_COLORS[$color_idx]}"
             done
         done
     done
