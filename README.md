@@ -1,6 +1,11 @@
 # calendarimg.sh
 Draw Github Commit Calendar Image Like in Bash.
 
+# features
+
+1. support any shape! (default to 7 * 52)
+2. customize!
+3. draw summary number!
 
 # usage
 
@@ -20,6 +25,8 @@ calendarimg_generate "output.ppm"
 ```
 
 ## FLAGS/CONFIGURATION
+
+Almost all flags/configurations support be set both before/after import, except those array.
 
 ### change size
 
