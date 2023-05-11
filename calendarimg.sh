@@ -31,7 +31,7 @@ declare -a CALENDARIMG_NUMBERS_DATA
 
 
 function calendarimg_init_number_data {
-    local scale_ratio i j k l idx number_sources number_base_data
+    local scale_ratio pad0 pad1 i j k l idx number_sources number_base_data pc0 pc1 pc2 pc3 pc4
     declare -a number_sources=(
         33080895
         4329604
@@ -44,24 +44,55 @@ function calendarimg_init_number_data {
         33095231
         33094719
     )
+    if [[ $CALENDARIMG_CELL_WIDTH -lt 5 ]];then
+        echo "CALENDARIMG_CELL_WIDTH is too small, should be at least 5, but got $CALENDARIMG_CELL_WIDTH" >&2
+        exit 1
+    fi
     ((scale_ratio=CALENDARIMG_CELL_WIDTH / 5))
+    pad0=0
+    pad1=0
+    pc3=""
+    pc4=""
+    if [[ $((CALENDARIMG_CELL_WIDTH - scale_ratio * 5)) -ne 0 ]];then
+        pad0=$(((CALENDARIMG_CELL_WIDTH - 5 * scale_ratio + 1) / 2))
+        pad1=$((CALENDARIMG_CELL_WIDTH - 5 * scale_ratio - pad0))
+        # echo "scale_ratio=$scale_ratio, pad0=$pad0, pad1=$pad1"
+        pc3="$(printf "0%.0s" $(seq 1 $pad0))"
+        pc4="$(printf "0%.0s" $(seq 1 $pad1))"
+    fi
+    pc0="$(printf "0%.0s" $(seq 1 $scale_ratio))"
+    pc1="$(printf "1%.0s" $(seq 1 $scale_ratio))"
+    pc2="$(printf "0%.0s" $(seq 1 "$CALENDARIMG_CELL_WIDTH"))"
+
 
     for i in {0..9};do
         number_base_data="$(echo "obase=2;${number_sources[i]} + 33554432" | bc)"
         number_base_data="${number_base_data:1}"
         CALENDARIMG_NUMBERS_DATA[i]=""
+        for ((j=0;j<pad0;j++));do
+            CALENDARIMG_NUMBERS_DATA[i]="${CALENDARIMG_NUMBERS_DATA[i]}$pc2"
+        done
         for j in {0..4};do
             for ((k=0;k<scale_ratio;k++));do
+                CALENDARIMG_NUMBERS_DATA[i]="${CALENDARIMG_NUMBERS_DATA[i]}$pc3"
                 for l in {0..4};do
                     idx=$((j * 5 + l ))
                     if [[ "${number_base_data:idx:1}" -gt 0 ]];then
-                        CALENDARIMG_NUMBERS_DATA[i]="${CALENDARIMG_NUMBERS_DATA[i]}$(printf "1%.0s" $(seq 1 $scale_ratio))"
+                        CALENDARIMG_NUMBERS_DATA[i]="${CALENDARIMG_NUMBERS_DATA[i]}$pc1"
                     else
-                        CALENDARIMG_NUMBERS_DATA[i]="${CALENDARIMG_NUMBERS_DATA[i]}$(printf "0%.0s" $(seq 1 $scale_ratio))"
+                        CALENDARIMG_NUMBERS_DATA[i]="${CALENDARIMG_NUMBERS_DATA[i]}$pc0"
                     fi
                 done
+                CALENDARIMG_NUMBERS_DATA[i]="${CALENDARIMG_NUMBERS_DATA[i]}$pc4"
             done
         done
+        for ((j=0;j<pad1;j++));do
+            CALENDARIMG_NUMBERS_DATA[i]="${CALENDARIMG_NUMBERS_DATA[i]}$pc2"
+        done
+        if [[ "${#CALENDARIMG_NUMBERS_DATA[i]}" -ne $((CALENDARIMG_CELL_WIDTH * CALENDARIMG_CELL_WIDTH)) ]];then
+            echo "fatal numbers, please report to dev with your parameters: $CALENDARIMG_CELL_WIDTH, ${#CALENDARIMG_NUMBERS_DATA[i]}"
+            exit 1
+        fi
     done
 }
 
@@ -86,7 +117,7 @@ function calendarimg_draw_number {
     echo "col_start_idx=$col_start_idx"
     for ((ci=0;ci<${#number};ci++));do
         number_var_name="${number:$ci:1}"
-        for ((i=0;i<CALENDARIMG_CELL_WIDTH+2*CALENDARIMG_BORDER;i++));do
+        for ((i=0;i<CALENDARIMG_CELL_WIDTH;i++));do
             for ((j=0;j<CALENDARIMG_CELL_WIDTH;j++));do
                 ((tidx=i*CALENDARIMG_CELL_WIDTH+j))
                 if [[ "${CALENDARIMG_NUMBERS_DATA[number_var_name]:tidx:1}" -gt 0 ]];then
