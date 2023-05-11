@@ -3,14 +3,19 @@
 
 source calendarimg.sh
 
-CALENDARIMG_COLS=21
-CALENDARIMG_ROWS=9
-# CALENDARIMG_MAJOR="row"
+CALENDARIMG_COLS=11
+CALENDARIMG_ROWS=12
+CALENDARIMG_MAJOR="row"
 
-# CALENDARIMG_SUMMARY_NUMBER="disabled"
+CALENDARIMG_CELL_WIDTH=25
 
-for i in {0..62};do
-    CALENDARIMG_DATA[i]=$(( i % 7 ));
+CALENDARIMG_SUMMARY_NUMBER="enabled"
+
+for i in {0..10};do
+    for j in {0..11};do
+        idx=$((i*12+j))
+        CALENDARIMG_DATA[idx]=$(( i < j ));
+    done
 done
 CALENDARIMG_LEVEL_LIMITS[0]=2
 CALENDARIMG_LEVEL_LIMITS[1]=5

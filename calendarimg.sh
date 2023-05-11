@@ -27,307 +27,53 @@ declare -a CALENDARIMG_DATA
 declare -a CALENDARIMG_LEVEL_LIMITS
 declare -a CALENDARIMG_LEVEL_COLORS
 CALENDARIMG_LAST_LEVEL=0
-
-# shellcheck disable=SC2034
-declare -a CALENDARIMG_NUMBER0=(
-    "111111111111111"
-    "111111111111111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111111111111111"
-    "111111111111111"
-)
-
-# shellcheck disable=SC2034
-declare -a CALENDARIMG_NUMBER1=(
-    "000000000000000"
-    "000000111000000"
-    "000001111000000"
-    "000011111000000"
-    "000110111000000"
-    "001100111000000"
-    "000000111000000"
-    "000000111000000"
-    "000000111000000"
-    "000000111000000"
-    "000000111000000"
-    "000000111000000"
-    "000000111000000"
-    "000000111000000"
-    "000000111000000"
-    "000000111000000"
-    "000000111000000"
-    "000000111000000"
-    "000000111000000"
-    "000000111000000"
-    "000000111000000"
-    "000000111000000"
-    "000000111000000"
-    "001111111111100"
-    "001111111111100"
-)
-
-# shellcheck disable=SC2034
-declare -a CALENDARIMG_NUMBER2=(
-    "111111111111111"
-    "111111111111111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "111111111111111"
-    "111111111111111"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111111111111111"
-    "111111111111111"
-)
+declare -a CALENDARIMG_NUMBERS_DATA
 
 
-# shellcheck disable=SC2034
-declare -a CALENDARIMG_NUMBER3=(
-    "111111111111111"
-    "111111111111111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "111111111111111"
-    "111111111111111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "111111111111111"
-    "111111111111111"
-)
+function calendarimg_init_number_data {
+    local scale_ratio i j k l idx number_sources number_base_data
+    declare -a number_sources=(
+        33080895
+        4329604
+        32570911
+        32570431
+        18414625
+        33061951
+        33062463
+        32539681
+        33095231
+        33094719
+    )
+    ((scale_ratio=CALENDARIMG_CELL_WIDTH / 5))
 
-# shellcheck disable=SC2034
-declare -a CALENDARIMG_NUMBER4=(
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111111111111111"
-    "111111111111111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-)
-
-# shellcheck disable=SC2034
-declare -a CALENDARIMG_NUMBER5=(
-    "111111111111111"
-    "111111111111111"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111111111111111"
-    "111111111111111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "111111111111111"
-    "111111111111111"
-)
-
-# shellcheck disable=SC2034
-declare -a CALENDARIMG_NUMBER6=(
-    "111111111111111"
-    "111111111111111"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111000000000000"
-    "111111111111111"
-    "111111111111111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111111111111111"
-    "111111111111111"
-)
-
-# shellcheck disable=SC2034
-declare -a CALENDARIMG_NUMBER7=(
-    "111111111111111"
-    "111111111111111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-)
-
-# shellcheck disable=SC2034
-declare -a CALENDARIMG_NUMBER8=(
-    "111111111111111"
-    "111111111111111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111111111111111"
-    "111111111111111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111111111111111"
-    "111111111111111"
-)
-
-# shellcheck disable=SC2034
-declare -a CALENDARIMG_NUMBER9=(
-    "111111111111111"
-    "111111111111111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111000000000111"
-    "111111111111111"
-    "111111111111111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "000000000000111"
-    "111111111111111"
-    "111111111111111"
-)
-
+    for i in {0..9};do
+        number_base_data="$(echo "obase=2;${number_sources[i]} + 33554432" | bc)"
+        number_base_data="${number_base_data:1}"
+        CALENDARIMG_NUMBERS_DATA[i]=""
+        for j in {0..4};do
+            for ((k=0;k<scale_ratio;k++));do
+                for l in {0..4};do
+                    idx=$((j * 5 + l ))
+                    if [[ "${number_base_data:idx:1}" -gt 0 ]];then
+                        CALENDARIMG_NUMBERS_DATA[i]="${CALENDARIMG_NUMBERS_DATA[i]}$(printf "1%.0s" $(seq 1 $scale_ratio))"
+                    else
+                        CALENDARIMG_NUMBERS_DATA[i]="${CALENDARIMG_NUMBERS_DATA[i]}$(printf "0%.0s" $(seq 1 $scale_ratio))"
+                    fi
+                done
+            done
+        done
+    done
+}
 
 function calendarimg_draw_number {
-    local number array_name direction idx row_start_idx col_start_idx number_var_name number_array
+    local number array_name direction idx row_start_idx col_start_idx number_var_name tidx
+
     number=$1
     array_name=$2
     direction=$3
     idx=$4
     if [[ "$direction" == "row" ]];then
-        row_start_idx=$((idx*CALENDARIMG_ITEM_WIDTH + CALENDARIMG_MARGIN))
+        ((row_start_idx=idx*CALENDARIMG_ITEM_WIDTH + CALENDARIMG_MARGIN + CALENDARIMG_BORDER))
         ((col_start_idx=CALENDARIMG_ITEM_WIDTH*CALENDARIMG_COLS + CALENDARIMG_MARGIN))
     elif [[ "$direction" == "col" ]];then
         ((row_start_idx=CALENDARIMG_ITEM_WIDTH*CALENDARIMG_ROWS + CALENDARIMG_MARGIN))
@@ -340,10 +86,10 @@ function calendarimg_draw_number {
     echo "col_start_idx=$col_start_idx"
     for ((ci=0;ci<${#number};ci++));do
         number_var_name="${number:$ci:1}"
-        declare -n number_array="CALENDARIMG_NUMBER${number_var_name}"
         for ((i=0;i<CALENDARIMG_CELL_WIDTH+2*CALENDARIMG_BORDER;i++));do
             for ((j=0;j<CALENDARIMG_CELL_WIDTH;j++));do
-                if [[ "${number_array[i]:j:1}" -gt 0 ]];then
+                ((tidx=i*CALENDARIMG_CELL_WIDTH+j))
+                if [[ "${CALENDARIMG_NUMBERS_DATA[number_var_name]:tidx:1}" -gt 0 ]];then
                     echo "${array_name}[\"$((i + row_start_idx)),$((j + col_start_idx))\"]=\"$CALENDARIMG_COLOR_NR\""
                 fi
             done
@@ -380,7 +126,7 @@ function calendarimg_check_colors {
 }
 
 
-function calendarimg_init_size {
+function calendarimg_init {
     local addition_items
     addition_items=0
     if [[ ${CALENDARIMG_SUMMARY_NUMBER^^} == "ENABLED" ]];then
@@ -389,6 +135,7 @@ function calendarimg_init_size {
     CALENDARIMG_ITEM_WIDTH=$((CALENDARIMG_CELL_WIDTH + CALENDARIMG_BORDER * 2 + CALENDARIMG_PADDING))
     CALENDARIMG_TOTAL_WIDTH=$((CALENDARIMG_ITEM_WIDTH * (CALENDARIMG_COLS + addition_items) - CALENDARIMG_PADDING + CALENDARIMG_MARGIN * 2))
     CALENDARIMG_TOTAL_HEIGTH=$((CALENDARIMG_ITEM_WIDTH * (CALENDARIMG_ROWS + addition_items) - CALENDARIMG_PADDING + CALENDARIMG_MARGIN * 2))
+    calendarimg_init_number_data
 }
 
 
@@ -409,7 +156,7 @@ function calendarimg_generate {
         return
     fi
 
-    calendarimg_init_size
+    calendarimg_init
 
 
     local cur_index cur_row cur_col points row_start_idx col_start_idx w h i j col_counts row_counts color_idx
