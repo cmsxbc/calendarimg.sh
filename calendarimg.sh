@@ -7,8 +7,8 @@ CALENDARIMG_BORDER=${CALENDARIMG_BORDER:-5}
 CALENDARIMG_PADDING=${CALENDARIMG_PADDING:-4}
 CALENDARIMG_MARGIN=${CALENDARIMG_MARGIN:-20}
 
-CALENDARIMG_COLS=${CALENDARIMG_COLS:-52}
-CALENDARIMG_ROWS=${CALENDARIMG_ROWS:-7}
+CALENDARIMG_COLS=${CALENDARIMG_COLS:-0}
+CALENDARIMG_ROWS=${CALENDARIMG_ROWS:-0}
 
 CALENDARIMG_SUMMARY_NUMBER=${CALENDARIMG_SUMMARY_NUMBER:-disabled}
 
@@ -20,6 +20,7 @@ CALENDARIMG_COLOR_NR=${CALENDARIMG_COLOR_NR:-"192 0 0"}
 
 
 CALENDARIMG_MAJOR=${CALENDARIMG_MAJOR:-row}
+CALENDARIMG_DATA_ORDER=${CALENDARIMG_DATA_ORDER:-normal}
 
 
 
@@ -158,14 +159,37 @@ function calendarimg_check_colors {
 
 
 function calendarimg_init {
-    local addition_items
+    local addition_items data_total
     addition_items=0
     if [[ ${CALENDARIMG_SUMMARY_NUMBER^^} == "ENABLED" ]];then
         addition_items=2
     fi
+
+    data_total=${#CALENDARIMG_DATA[@]}
+
+    if [[ $CALENDARIMG_COLS -le 0 && $CALENDARIMG_ROWS -le 0 ]];then
+        echo "CALENDARIMG_ROWS=$CALENDARIMG_ROWS, CALENDARIMG_COLS=$CALENDARIMG_COLS, both <= 0" >&2
+        exit 1
+    elif [[ $CALENDARIMG_COLS -le 0 ]];then
+        ((CALENDARIMG_COLS=data_total/CALENDARIMG_ROWS))
+        if [[ $((CALENDARIMG_COLS * CALENDARIMG_ROWS)) -lt data_total ]];then
+            ((CALENDARIMG_COLS+=1))
+        fi
+    elif [[ $CALENDARIMG_ROWS -le 0 ]];then
+        ((CALENDARIMG_ROWS=data_total/CALENDARIMG_COLS))
+        if [[ $((CALENDARIMG_COLS * CALENDARIMG_ROWS)) -lt data_total ]];then
+            ((CALENDARIMG_ROWS+=1))
+        fi
+    elif [[ $((CALENDARIMG_COLS * CALENDARIMG_ROWS)) -lt data_total ]];then
+        echo "Too small shape, there is $data_total values, but shape (rows * cols) is $CALENDARIMG_ROWS * $CALENDARIMG_COLS" >&2
+        exit 1
+    fi
+
+
     CALENDARIMG_ITEM_WIDTH=$((CALENDARIMG_CELL_WIDTH + CALENDARIMG_BORDER * 2 + CALENDARIMG_PADDING))
     CALENDARIMG_TOTAL_WIDTH=$((CALENDARIMG_ITEM_WIDTH * (CALENDARIMG_COLS + addition_items) - CALENDARIMG_PADDING + CALENDARIMG_MARGIN * 2))
     CALENDARIMG_TOTAL_HEIGTH=$((CALENDARIMG_ITEM_WIDTH * (CALENDARIMG_ROWS + addition_items) - CALENDARIMG_PADDING + CALENDARIMG_MARGIN * 2))
+    CALENDARIMG_TOTAL=$((CALENDARIMG_COLS * CALENDARIMG_ROWS))
     calendarimg_init_number_data
 }
 
@@ -180,17 +204,10 @@ function calendarimg_generate {
         return
     fi
 
-    CALENDARIMG_TOTAL=$((CALENDARIMG_COLS * CALENDARIMG_ROWS))
-
-    if [[ ${#CALENDARIMG_DATA[@]} -ne $CALENDARIMG_TOTAL ]];then
-        echo "data length: ${#CALENDARIMG_DATA[@]} != $CALENDARIMG_TOTAL" >&2;
-        return
-    fi
-
     calendarimg_init
 
 
-    local cur_index cur_row cur_col points row_start_idx col_start_idx w h i j col_counts row_counts color_idx
+    local cur_index row_col_idx cur_row cur_col points row_start_idx col_start_idx w h i j col_counts row_counts color_idx data_total
     declare -A points
     for ((h=0;h<CALENDARIMG_TOTAL_HEIGTH;h++));do
         for ((w=0;w<CALENDARIMG_TOTAL_WIDTH;w++));do
@@ -207,13 +224,20 @@ function calendarimg_generate {
         row_counts[i]=0
     done
 
-    for ((cur_index=0;cur_index<CALENDARIMG_TOTAL;cur_index++)); do
-        if [[ $CALENDARIMG_MAJOR == "row" ]];then
-            cur_col=$((cur_index / CALENDARIMG_ROWS))
-            cur_row=$((cur_index % CALENDARIMG_ROWS))
+    data_total=${#CALENDARIMG_DATA[@]}
+
+    for ((cur_index=0;cur_index<data_total;cur_index++)); do
+        if [[ $CALENDARIMG_DATA_ORDER == "reversed" ]];then
+            row_col_idx=$((CALENDARIMG_TOTAL-1-cur_index))
         else
-            cur_col=$((cur_index % CALENDARIMG_COLS))
-            cur_row=$((cur_index / CALENDARIMG_COLS))
+            row_col_idx=$cur_index
+        fi
+        if [[ $CALENDARIMG_MAJOR == "row" ]];then
+            cur_col=$((row_col_idx / CALENDARIMG_ROWS))
+            cur_row=$((row_col_idx % CALENDARIMG_ROWS))
+        else
+            cur_col=$((row_col_idx % CALENDARIMG_COLS))
+            cur_row=$((row_col_idx / CALENDARIMG_COLS))
         fi
         row_start_idx=$((cur_row * CALENDARIMG_ITEM_WIDTH + CALENDARIMG_MARGIN))
         col_start_idx=$((cur_col * CALENDARIMG_ITEM_WIDTH + CALENDARIMG_MARGIN))

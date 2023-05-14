@@ -41,6 +41,13 @@ Almost all flags/configurations support be set both before/after import, except 
 2. `CALENDARIMG_ROWS`: how many rows.
 3. `CALENDARIMG_MAJRO`: col major or row marjor, default is `row`.
 
+### change data order
+
+`CALENDARIMG_DATA_ORDER`, default is `normal`, availble choice is `reversed`.
+
+1. when it is `normal`, `${CALENDARIMG_DATA[0]` is set to left-top.
+2. when it is `reversed`, `${CALENDARIMG_DATA[0]` is set to right-bottom.
+
 ### change level & colors
 
 1. `CALENDARIMG_LEVEL_LIMITS`: limits for every level except last.
