@@ -41,6 +41,12 @@ Almost all flags/configurations support be set both before/after import, except 
 2. `CALENDARIMG_ROWS`: how many rows.
 3. `CALENDARIMG_MAJRO`: col major or row marjor, default is `row`.
 
+### change style
+1. border style: availble values: `solid`, `dashed`, `hidden`
+
+    1. `CALENDARIMG_BORDER_STYLE`: the border style when there is data, default to `solid`
+    2. `CALENDARIMG_NODATA_BORDER_STYLE`: the border style when there is no data, default to `dashed`
+
 ### change data order
 
 `CALENDARIMG_DATA_ORDER`, default is `normal`, availble choice is `reversed`.
