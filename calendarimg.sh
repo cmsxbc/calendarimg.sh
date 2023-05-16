@@ -139,7 +139,7 @@ function calendarimg_draw_number {
 
 
 function calendarimg_draw_border {
-    local style array_name row_start_idx col_start_idx i j
+    local style array_name row_start_idx col_start_idx i j i_end k l row_start_idx1 col_start_idx1
     style="$1"
     array_name="$2"
     row_start_idx=$3
@@ -154,16 +154,29 @@ function calendarimg_draw_border {
             done
         done
     elif [[ $style == "dashed" ]];then
-        for ((i=0;i<CALENDARIMG_CELL_WIDTH+CALENDARIMG_BORDER*2;i++));do
-            if [[ $i -lt $(( CALENDARIMG_CELL_WIDTH+CALENDARIMG_BORDER)) && $(( (i / CALENDARIMG_BORDER) % 2 )) -gt 0 ]];then
+        ((row_start_idx1=row_start_idx+CALENDARIMG_CELL_WIDTH+CALENDARIMG_BORDER*2))
+        ((col_start_idx1=col_start_idx+CALENDARIMG_CELL_WIDTH+CALENDARIMG_BORDER*2))
+        ((i_end=CALENDARIMG_CELL_WIDTH/2+CALENDARIMG_BORDER+1))
+        for ((i=0;i<i_end;i++));do
+            if [[ $(( (i / CALENDARIMG_BORDER) % 2 )) -gt 0 ]];then
                 # echo "$i skipped\n\n"
                 continue;
             fi
             for ((j=0;j<CALENDARIMG_BORDER;j++));do
+
                 echo "${array_name}[\"$((row_start_idx+j)),$((col_start_idx+i))\"]=\"$CALENDARIMG_COLOR_BR\""
-                echo "${array_name}[\"$((row_start_idx + CALENDARIMG_CELL_WIDTH + CALENDARIMG_BORDER + j)),$((col_start_idx+i))\"]=\"$CALENDARIMG_COLOR_BR\""
                 echo "${array_name}[\"$((row_start_idx+i)),$((col_start_idx+j))\"]=\"$CALENDARIMG_COLOR_BR\""
-                echo "${array_name}[\"$((row_start_idx+i)),$((col_start_idx + CALENDARIMG_CELL_WIDTH + CALENDARIMG_BORDER +j))\"]=\"$CALENDARIMG_COLOR_BR\""
+
+                echo "${array_name}[\"$((row_start_idx+i)),$((col_start_idx1-j))\"]=\"$CALENDARIMG_COLOR_BR\""
+                echo "${array_name}[\"$((row_start_idx+j)),$((col_start_idx1-i))\"]=\"$CALENDARIMG_COLOR_BR\""
+
+
+                echo "${array_name}[\"$((row_start_idx1-j)),$((col_start_idx+i))\"]=\"$CALENDARIMG_COLOR_BR\""
+                echo "${array_name}[\"$((row_start_idx1-i)),$((col_start_idx+j))\"]=\"$CALENDARIMG_COLOR_BR\""
+
+                echo "${array_name}[\"$((row_start_idx1-j)),$((col_start_idx1-i))\"]=\"$CALENDARIMG_COLOR_BR\""
+                echo "${array_name}[\"$((row_start_idx1-i)),$((col_start_idx1-j))\"]=\"$CALENDARIMG_COLOR_BR\""
+
             done
         done
     fi
