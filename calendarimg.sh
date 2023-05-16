@@ -62,7 +62,9 @@ function calendarimg_init_number_data {
         pad1=$((CALENDARIMG_CELL_WIDTH - 5 * scale_ratio - pad0))
         # echo "scale_ratio=$scale_ratio, pad0=$pad0, pad1=$pad1"
         pc3="$(printf "0%.0s" $(seq 1 $pad0))"
-        pc4="$(printf "0%.0s" $(seq 1 $pad1))"
+        if [[ $pad1 -gt 0 ]];then
+            pc4="$(printf "0%.0s" $(seq 1 $pad1))"
+        fi
     fi
     pc0="$(printf "0%.0s" $(seq 1 $scale_ratio))"
     pc1="$(printf "1%.0s" $(seq 1 $scale_ratio))"
