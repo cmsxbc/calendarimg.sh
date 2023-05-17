@@ -156,8 +156,8 @@ function calendarimg_draw_border {
             done
         done
     elif [[ $style == "dashed" ]];then
-        ((row_start_idx1=row_start_idx+CALENDARIMG_CELL_WIDTH+CALENDARIMG_BORDER*2))
-        ((col_start_idx1=col_start_idx+CALENDARIMG_CELL_WIDTH+CALENDARIMG_BORDER*2))
+        ((row_start_idx1=row_start_idx+CALENDARIMG_CELL_WIDTH+CALENDARIMG_BORDER*2-1))
+        ((col_start_idx1=col_start_idx+CALENDARIMG_CELL_WIDTH+CALENDARIMG_BORDER*2-1))
         ((i_end=CALENDARIMG_CELL_WIDTH/2+CALENDARIMG_BORDER+1))
         for ((i=0;i<i_end;i++));do
             if [[ $(( (i / CALENDARIMG_BORDER) % 2 )) -gt 0 ]];then
