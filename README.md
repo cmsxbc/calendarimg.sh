@@ -16,13 +16,15 @@ source calendarimg.sh
 # set flags
 
 # set data
-for i in {0..363};do
+for i in {0..362};do
     CALENDARIMG_DATA[i]=$(( i % 7 ));
 done
 
 # draw & save to file
 calendarimg_generate "output.ppm"
 ```
+
+![default](examples/default.png)
 
 ## FLAGS/CONFIGURATION
 
@@ -80,3 +82,9 @@ show a summary number for every rows and cols.
 ## Convert ppm to png
 
 use `pnm2png` or `pnmtopng`
+
+
+# examples
+
+See [examples](examples/)
+
