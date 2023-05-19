@@ -3,7 +3,7 @@ Draw Github Commit Calendar Image Like in Bash.
 
 # features
 
-1. support any shape! (default to 7 * 52)
+1. support any shape!
 2. customize!
 3. draw summary number!
 
@@ -42,6 +42,14 @@ Almost all flags/configurations support be set both before/after import, except 
 1. `CALENDARIMG_COLS`: how many columns.
 2. `CALENDARIMG_ROWS`: how many rows.
 3. `CALENDARIMG_MAJRO`: col major or row marjor, default is `row`.
+
+The default shape is set the direction defined by `CALENDARIMG_MAJOR` to 7, and calculate the other side
+by divided by total data size.
+
+If either `CALENDARIMG_COLS` or `CALENDARIMG_ROWS` is set, the other side is calculated.
+
+If both `CALENDARIMG_COLS` and `CALENDARIMG_ROWS` are set, they won't be calcuated, but the product should greater than total data size.
+
 
 ### change style
 1. border style: availble values: `solid`, `dashed`, `hidden`
