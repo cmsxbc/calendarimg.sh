@@ -146,16 +146,3 @@ done
 ```
 
 ![reversed_data](reversed_data.png)
-
-## Lack some data
-
-```bash
-for i in {0..363};do
-    if [[ $(( i % 13 )) -eq 3 ]];then
-        continue
-    fi
-    CALENDARIMG_DATA[i]=$(( i % 7));
-done
-```
-
-![lack_some_data](lack_some_data.png)
