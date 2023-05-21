@@ -146,3 +146,16 @@ done
 ```
 
 ![reversed_data](reversed_data.png)
+
+## Lack of item
+
+```bash
+for i in {0..362};do
+    if [[ $((i % 13)) -eq 0 ]];then
+        continue
+    fi
+    CALENDARIMG_DATA[i]=$(( i % 7));
+done
+```
+
+![lack_of_item](lack_of_item.png)

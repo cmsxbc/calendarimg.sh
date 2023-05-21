@@ -133,6 +133,15 @@ function config_reversed_data {
     done
 }
 
+function config_lack_of_item {
+    for i in {0..362};do
+        if [[ $((i % 13)) -eq 0 ]];then
+            continue
+        fi
+        CALENDARIMG_DATA[i]=$(( i % 7));
+    done
+}
+
 function gen_readme_item {
     local name name4human name4func
     name="$1"

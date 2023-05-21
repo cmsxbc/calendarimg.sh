@@ -206,14 +206,16 @@ function calendarimg_draw_border {
 
 function calendarimg_check_colors {
     if [[ -z "${CALENDARIMG_LEVEL_LIMITS[*]}" ]];then
-        CALENDARIMG_LEVEL_LIMITS[0]=3
-        CALENDARIMG_LEVEL_LIMITS[1]=7
+        CALENDARIMG_LEVEL_LIMITS[0]=1
+        CALENDARIMG_LEVEL_LIMITS[1]=3
+        CALENDARIMG_LEVEL_LIMITS[2]=7
     fi
 
     if [[ -z "${CALENDARIMG_LEVEL_COLORS[*]}" ]];then
-        CALENDARIMG_LEVEL_COLORS[0]="0 192 0"
-        CALENDARIMG_LEVEL_COLORS[1]="192 192 0"
-        CALENDARIMG_LEVEL_COLORS[2]="255 0 0"
+        CALENDARIMG_LEVEL_COLORS[0]="$CALENDARIMG_COLOR_BG"
+        CALENDARIMG_LEVEL_COLORS[1]="0 192 0"
+        CALENDARIMG_LEVEL_COLORS[2]="192 192 0"
+        CALENDARIMG_LEVEL_COLORS[3]="255 0 0"
     fi
 
     CALENDARIMG_LEVEL_COUNTS="${#CALENDARIMG_LEVEL_COLORS[@]}"
@@ -234,7 +236,7 @@ function calendarimg_init {
         addition_items=2
     fi
 
-    data_total=${#CALENDARIMG_DATA[@]}
+    data_total="$(echo "${!CALENDARIMG_DATA[*]}" | awk '{print $NF}')"
 
     if [[ $CALENDARIMG_COLS -eq 0 && $CALENDARIMG_ROWS -eq 0 ]];then
         if [[ $CALENDARIMG_MAJOR == "row" ]];then
@@ -301,8 +303,6 @@ function calendarimg_generate {
         row_counts[i]=0
     done
 
-    data_total=${#CALENDARIMG_DATA[@]}
-
     for ((cur_index=0;cur_index<CALENDARIMG_TOTAL;cur_index++)); do
         if [[ $CALENDARIMG_DATA_ORDER == "reversed" ]];then
             row_col_idx=$((CALENDARIMG_TOTAL-1-cur_index))
@@ -318,18 +318,21 @@ function calendarimg_generate {
         fi
         row_start_idx=$((cur_row * CALENDARIMG_ITEM_WIDTH + CALENDARIMG_MARGIN))
         col_start_idx=$((cur_col * CALENDARIMG_ITEM_WIDTH + CALENDARIMG_MARGIN))
-        if [[ $cur_index -lt data_total ]];then
+        if [ ${CALENDARIMG_DATA[cur_index]+exist} ];then
             style="$CALENDARIMG_BORDER_STYLE"
         else
             style="$CALENDARIMG_NODATA_BORDER_STYLE"
         fi
         eval "$(calendarimg_draw_border "$style" points $row_start_idx $col_start_idx)"
 
-        if [[ ${CALENDARIMG_DATA[$cur_index]} -eq 0 ]];then
+        if [ ! ${CALENDARIMG_DATA[cur_index]+notexist} ];then
             continue
         fi
-        ((col_counts[cur_col]+=1))
-        ((row_counts[cur_row]+=1))
+
+        if [[ ${CALENDARIMG_DATA[cur_index]} -ne 0 ]];then
+            ((col_counts[cur_col]+=1))
+            ((row_counts[cur_row]+=1))
+        fi
 
         color_idx=0
         for ((;color_idx<CALENDARIMG_LAST_LEVEL;color_idx++));do
