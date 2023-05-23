@@ -240,7 +240,7 @@ function calendarimg_init {
         addition_items=2
     fi
 
-    data_total="$(echo "${!CALENDARIMG_DATA[*]}" | awk '{print $NF}')"
+    data_total=$(( $(echo "${!CALENDARIMG_DATA[*]}" | awk '{print $NF}') + 1))
 
     if [[ $CALENDARIMG_COLS -eq 0 && $CALENDARIMG_ROWS -eq 0 ]];then
         if [[ $CALENDARIMG_MAJOR == "row" ]];then
