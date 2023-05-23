@@ -22,6 +22,7 @@ CALENDARIMG_SUMMARY_NUMBER=${CALENDARIMG_SUMMARY_NUMBER:-disabled}
 
 CALENDARIMG_COLOR_BG=${CALENDARIMG_COLOR_BG:-"255 255 255"}
 CALENDARIMG_COLOR_BR=${CALENDARIMG_COLOR_BR:-"0 0 0"}
+CALENDARIMG_COLOR_NDBR=${CALENDARIMG_COLOR_NDBR:-"0 0 0"}
 CALENDARIMG_COLOR_NR=${CALENDARIMG_COLOR_NR:-"192 0 0"}
 
 
@@ -48,8 +49,10 @@ function calendarimg_reset_default {
     CALENDARIMG_ROWS=0
     unset CALENDARIMG_LEVEL_LIMITS
     unset CALENDARIMG_LEVEL_COLORS
+    unset CALENDARIMG_DATA
     declare -a CALENDARIMG_LEVEL_LIMITS
     declare -a CALENDARIMG_LEVEL_COLORS
+    declare -a CALENDARIMG_DATA
 }
 
 
@@ -160,18 +163,19 @@ function calendarimg_draw_number {
 
 
 function calendarimg_draw_border {
-    local style array_name row_start_idx col_start_idx i j i_end k l row_start_idx1 col_start_idx1
+    local style color array_name row_start_idx col_start_idx i j i_end k l row_start_idx1 col_start_idx1
     style="$1"
-    array_name="$2"
-    row_start_idx=$3
-    col_start_idx=$4
+    color="$2"
+    array_name="$3"
+    row_start_idx=$4
+    col_start_idx=$5
     if [[ $style == "solid" ]];then
         for ((i=0;i<CALENDARIMG_CELL_WIDTH+CALENDARIMG_BORDER*2;i++));do
             for ((j=0;j<CALENDARIMG_BORDER;j++));do
-                echo "${array_name}[\"$((row_start_idx+j)),$((col_start_idx+i))\"]=\"$CALENDARIMG_COLOR_BR\""
-                echo "${array_name}[\"$((row_start_idx + CALENDARIMG_CELL_WIDTH + CALENDARIMG_BORDER + j)),$((col_start_idx+i))\"]=\"$CALENDARIMG_COLOR_BR\""
-                echo "${array_name}[\"$((row_start_idx+i)),$((col_start_idx+j))\"]=\"$CALENDARIMG_COLOR_BR\""
-                echo "${array_name}[\"$((row_start_idx+i)),$((col_start_idx + CALENDARIMG_CELL_WIDTH + CALENDARIMG_BORDER +j))\"]=\"$CALENDARIMG_COLOR_BR\""
+                echo "${array_name}[\"$((row_start_idx+j)),$((col_start_idx+i))\"]=\"$color\""
+                echo "${array_name}[\"$((row_start_idx + CALENDARIMG_CELL_WIDTH + CALENDARIMG_BORDER + j)),$((col_start_idx+i))\"]=\"$color\""
+                echo "${array_name}[\"$((row_start_idx+i)),$((col_start_idx+j))\"]=\"$color\""
+                echo "${array_name}[\"$((row_start_idx+i)),$((col_start_idx + CALENDARIMG_CELL_WIDTH + CALENDARIMG_BORDER +j))\"]=\"$color\""
             done
         done
     elif [[ $style == "dashed" ]];then
@@ -185,18 +189,18 @@ function calendarimg_draw_border {
             fi
             for ((j=0;j<CALENDARIMG_BORDER;j++));do
 
-                echo "${array_name}[\"$((row_start_idx+j)),$((col_start_idx+i))\"]=\"$CALENDARIMG_COLOR_BR\""
-                echo "${array_name}[\"$((row_start_idx+i)),$((col_start_idx+j))\"]=\"$CALENDARIMG_COLOR_BR\""
+                echo "${array_name}[\"$((row_start_idx+j)),$((col_start_idx+i))\"]=\"$color\""
+                echo "${array_name}[\"$((row_start_idx+i)),$((col_start_idx+j))\"]=\"$color\""
 
-                echo "${array_name}[\"$((row_start_idx+i)),$((col_start_idx1-j))\"]=\"$CALENDARIMG_COLOR_BR\""
-                echo "${array_name}[\"$((row_start_idx+j)),$((col_start_idx1-i))\"]=\"$CALENDARIMG_COLOR_BR\""
+                echo "${array_name}[\"$((row_start_idx+i)),$((col_start_idx1-j))\"]=\"$color\""
+                echo "${array_name}[\"$((row_start_idx+j)),$((col_start_idx1-i))\"]=\"$color\""
 
 
-                echo "${array_name}[\"$((row_start_idx1-j)),$((col_start_idx+i))\"]=\"$CALENDARIMG_COLOR_BR\""
-                echo "${array_name}[\"$((row_start_idx1-i)),$((col_start_idx+j))\"]=\"$CALENDARIMG_COLOR_BR\""
+                echo "${array_name}[\"$((row_start_idx1-j)),$((col_start_idx+i))\"]=\"$color\""
+                echo "${array_name}[\"$((row_start_idx1-i)),$((col_start_idx+j))\"]=\"$color\""
 
-                echo "${array_name}[\"$((row_start_idx1-j)),$((col_start_idx1-i))\"]=\"$CALENDARIMG_COLOR_BR\""
-                echo "${array_name}[\"$((row_start_idx1-i)),$((col_start_idx1-j))\"]=\"$CALENDARIMG_COLOR_BR\""
+                echo "${array_name}[\"$((row_start_idx1-j)),$((col_start_idx1-i))\"]=\"$color\""
+                echo "${array_name}[\"$((row_start_idx1-i)),$((col_start_idx1-j))\"]=\"$color\""
 
             done
         done
@@ -286,7 +290,7 @@ function calendarimg_generate {
     calendarimg_init
 
 
-    local cur_index row_col_idx cur_row cur_col points row_start_idx col_start_idx w h i j col_counts row_counts color_idx data_total style
+    local cur_index row_col_idx cur_row cur_col points row_start_idx col_start_idx w h i j col_counts row_counts color_idx data_total style color
     declare -A points
     for ((h=0;h<CALENDARIMG_TOTAL_HEIGTH;h++));do
         for ((w=0;w<CALENDARIMG_TOTAL_WIDTH;w++));do
@@ -320,10 +324,12 @@ function calendarimg_generate {
         col_start_idx=$((cur_col * CALENDARIMG_ITEM_WIDTH + CALENDARIMG_MARGIN))
         if [ ${CALENDARIMG_DATA[cur_index]+exist} ];then
             style="$CALENDARIMG_BORDER_STYLE"
+            color="$CALENDARIMG_COLOR_BR"
         else
             style="$CALENDARIMG_NODATA_BORDER_STYLE"
+            color="$CALENDARIMG_COLOR_NDBR"
         fi
-        eval "$(calendarimg_draw_border "$style" points $row_start_idx $col_start_idx)"
+        eval "$(calendarimg_draw_border "$style" "$color" points $row_start_idx $col_start_idx)"
 
         if [ ! ${CALENDARIMG_DATA[cur_index]+notexist} ];then
             continue

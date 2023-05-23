@@ -134,6 +134,8 @@ function config_reversed_data {
 }
 
 function config_lack_of_item {
+    CALENDARIMG_COLOR_BR="192 192 0"
+    CALENDARIMG_COLOR_NDBR="0 0 192"
     for i in {0..362};do
         if [[ $((i % 13)) -eq 0 ]];then
             continue
