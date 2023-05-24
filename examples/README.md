@@ -44,6 +44,36 @@ done
 
 ![modify_border_style](modify_border_style.png)
 
+## Modify border style by direction
+
+```bash
+CALENDARIMG_BORDER_STYLE="dashed solid"
+CALENDARIMG_NODATA_BORDER_STYLE="solid dashed"
+for i in {0..20};do
+    if [[ $((i % 2)) -gt 0 ]];then
+        continue
+    fi
+    CALENDARIMG_DATA[i]=1;
+done
+```
+
+![modify_border_style_by_direction](modify_border_style_by_direction.png)
+
+## Modify border style by side
+
+```bash
+CALENDARIMG_BORDER_STYLE="dashed solid hidden dashed"
+CALENDARIMG_NODATA_BORDER_STYLE="solid hidden dashed solid"
+for i in {0..20};do
+    if [[ $((i % 2)) -gt 0 ]];then
+        continue
+    fi
+    CALENDARIMG_DATA[i]=1;
+done
+```
+
+![modify_border_style_by_side](modify_border_style_by_side.png)
+
 ## Modify padding
 
 ```bash

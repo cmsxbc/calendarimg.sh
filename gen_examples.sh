@@ -62,6 +62,28 @@ function config_modify_border_style {
     done
 }
 
+function config_modify_border_style_by_direction {
+    CALENDARIMG_BORDER_STYLE="dashed solid"
+    CALENDARIMG_NODATA_BORDER_STYLE="solid dashed"
+    for i in {0..20};do
+        if [[ $((i % 2)) -gt 0 ]];then
+            continue
+        fi
+        CALENDARIMG_DATA[i]=1;
+    done
+}
+
+function config_modify_border_style_by_side {
+    CALENDARIMG_BORDER_STYLE="dashed solid hidden dashed"
+    CALENDARIMG_NODATA_BORDER_STYLE="solid hidden dashed solid"
+    for i in {0..20};do
+        if [[ $((i % 2)) -gt 0 ]];then
+            continue
+        fi
+        CALENDARIMG_DATA[i]=1;
+    done
+}
+
 function config_modify_padding {
     CALENDARIMG_PADDING=10
     for i in {0..362};do

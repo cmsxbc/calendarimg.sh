@@ -163,48 +163,66 @@ function calendarimg_draw_number {
 
 
 function calendarimg_draw_border {
-    local style color array_name row_start_idx col_start_idx i j i_end k l row_start_idx1 col_start_idx1
-    style="$1"
+    local style styles color array_name row_start_idx col_start_idx i j i_end k l row_start_idx1 col_start_idx1 si valid_sis need_skip
+    declare -a styles
+    IFS=' ' read -r -a styles <<< "$1"
     color="$2"
     array_name="$3"
     row_start_idx=$4
     col_start_idx=$5
-    if [[ $style == "solid" ]];then
-        for ((i=0;i<CALENDARIMG_CELL_WIDTH+CALENDARIMG_BORDER*2;i++));do
-            for ((j=0;j<CALENDARIMG_BORDER;j++));do
-                echo "${array_name}[\"$((row_start_idx+j)),$((col_start_idx+i))\"]=\"$color\""
-                echo "${array_name}[\"$((row_start_idx + CALENDARIMG_CELL_WIDTH + CALENDARIMG_BORDER + j)),$((col_start_idx+i))\"]=\"$color\""
-                echo "${array_name}[\"$((row_start_idx+i)),$((col_start_idx+j))\"]=\"$color\""
-                echo "${array_name}[\"$((row_start_idx+i)),$((col_start_idx + CALENDARIMG_CELL_WIDTH + CALENDARIMG_BORDER +j))\"]=\"$color\""
-            done
+    ((row_start_idx1=row_start_idx+CALENDARIMG_CELL_WIDTH+CALENDARIMG_BORDER*2-1))
+    ((col_start_idx1=col_start_idx+CALENDARIMG_CELL_WIDTH+CALENDARIMG_BORDER*2-1))
+    ((i_end=CALENDARIMG_CELL_WIDTH/2+CALENDARIMG_BORDER+1))
+    if [[ ${#styles[@]} -eq 1 ]];then
+        for ((i=1;i<4;i++));do
+            styles[i]="${styles[0]}"
         done
-    elif [[ $style == "dashed" ]];then
-        ((row_start_idx1=row_start_idx+CALENDARIMG_CELL_WIDTH+CALENDARIMG_BORDER*2-1))
-        ((col_start_idx1=col_start_idx+CALENDARIMG_CELL_WIDTH+CALENDARIMG_BORDER*2-1))
-        ((i_end=CALENDARIMG_CELL_WIDTH/2+CALENDARIMG_BORDER+1))
-        for ((i=0;i<i_end;i++));do
-            if [[ $(( (i / CALENDARIMG_BORDER) % 2 )) -gt 0 ]];then
-                # echo "$i skipped\n\n"
-                continue;
-            fi
-            for ((j=0;j<CALENDARIMG_BORDER;j++));do
-
-                echo "${array_name}[\"$((row_start_idx+j)),$((col_start_idx+i))\"]=\"$color\""
-                echo "${array_name}[\"$((row_start_idx+i)),$((col_start_idx+j))\"]=\"$color\""
-
-                echo "${array_name}[\"$((row_start_idx+i)),$((col_start_idx1-j))\"]=\"$color\""
-                echo "${array_name}[\"$((row_start_idx+j)),$((col_start_idx1-i))\"]=\"$color\""
-
-
-                echo "${array_name}[\"$((row_start_idx1-j)),$((col_start_idx+i))\"]=\"$color\""
-                echo "${array_name}[\"$((row_start_idx1-i)),$((col_start_idx+j))\"]=\"$color\""
-
-                echo "${array_name}[\"$((row_start_idx1-j)),$((col_start_idx1-i))\"]=\"$color\""
-                echo "${array_name}[\"$((row_start_idx1-i)),$((col_start_idx1-j))\"]=\"$color\""
-
-            done
+    elif [[ ${#styles[@]} -eq 2 ]];then
+        for ((i=0;i<2;i++));do
+            styles[i+2]="${styles[i]}"
         done
     fi
+    if [[ ${#styles[@]} -ne 4 ]];then
+        echo "echo 'styles is invalid, expect 1 2 4 values, but got ${#styles[@]}: $1' >&2;exit 1"
+    fi
+    for ((si=0;si<4;si++));do
+        if [[ "${styles[si]}" == "hidden" ]];then
+            continue
+        fi
+        valid_sis="$valid_sis $si"
+    done
+    for ((i=0;i<i_end;i++));do
+        if [[ $(( (i / CALENDARIMG_BORDER) % 2 )) -gt 0 ]];then
+            need_skip=1
+        else
+            need_skip=0
+        fi
+        for ((j=0;j<CALENDARIMG_BORDER;j++));do
+            for si in $valid_sis;do
+                if [[ "${styles[$si]}" == dashed && $need_skip -gt 0 ]];then
+                    continue;
+                fi
+                case $si in
+                    0 )
+                        echo "${array_name}[\"$((row_start_idx+j)),$((col_start_idx+i))\"]=\"$color\""
+                        echo "${array_name}[\"$((row_start_idx+j)),$((col_start_idx1-i))\"]=\"$color\""
+                        ;;
+                    1 )
+                        echo "${array_name}[\"$((row_start_idx+i)),$((col_start_idx1-j))\"]=\"$color\""
+                        echo "${array_name}[\"$((row_start_idx1-i)),$((col_start_idx1-j))\"]=\"$color\""
+                        ;;
+                    2 )
+                        echo "${array_name}[\"$((row_start_idx1-j)),$((col_start_idx+i))\"]=\"$color\""
+                        echo "${array_name}[\"$((row_start_idx1-j)),$((col_start_idx1-i))\"]=\"$color\""
+                        ;;
+                    3 )
+                        echo "${array_name}[\"$((row_start_idx+i)),$((col_start_idx+j))\"]=\"$color\""
+                        echo "${array_name}[\"$((row_start_idx1-i)),$((col_start_idx+j))\"]=\"$color\""
+                        ;;
+                esac
+            done
+        done
+    done
 }
 
 
