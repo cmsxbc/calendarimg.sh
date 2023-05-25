@@ -166,6 +166,18 @@ function config_lack_of_item {
     done
 }
 
+function config_enable_connected {
+    CALENDARIMG_CONNECTED=enabled
+    # CALENDARIMG_PADDING=0
+    # CALENDARIMG_BORDER=1
+    for i in {0..362};do
+        if [[ $((i % 13)) -gt 7 ]];then
+            continue
+        fi
+        CALENDARIMG_DATA[i]=$(( i % 7));
+    done
+}
+
 function gen_readme_item {
     local name name4human name4func
     name="$1"

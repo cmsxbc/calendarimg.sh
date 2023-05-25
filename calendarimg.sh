@@ -28,6 +28,7 @@ CALENDARIMG_COLOR_NR=${CALENDARIMG_COLOR_NR:-"192 0 0"}
 
 CALENDARIMG_MAJOR=${CALENDARIMG_MAJOR:-row}
 CALENDARIMG_DATA_ORDER=${CALENDARIMG_DATA_ORDER:-normal}
+CALENDARIMG_CONNECTED=${CALENDARIMG_CONNECTED:-disabled}
 
 CALENDARIMG_LAST_LEVEL=0
 
@@ -45,6 +46,7 @@ function calendarimg_reset_default {
     CALENDARIMG_COLOR_NR="192 0 0"
     CALENDARIMG_MAJOR="row"
     CALENDARIMG_DATA_ORDER="normal"
+    CALENDARIMG_CONNECTED=disabled
     CALENDARIMG_COLS=0
     CALENDARIMG_ROWS=0
     unset CALENDARIMG_LEVEL_LIMITS
@@ -186,7 +188,7 @@ function calendarimg_draw_border {
         echo "echo 'styles is invalid, expect 1 2 4 values, but got ${#styles[@]}: $1' >&2;exit 1"
     fi
     for ((si=0;si<4;si++));do
-        if [[ "${styles[si]}" == "hidden" ]];then
+        if [[ "${styles[si]^^}" == "HIDDEN" ]];then
             continue
         fi
         valid_sis="$valid_sis $si"
@@ -199,7 +201,7 @@ function calendarimg_draw_border {
         fi
         for ((j=0;j<CALENDARIMG_BORDER;j++));do
             for si in $valid_sis;do
-                if [[ "${styles[$si]}" == dashed && $need_skip -gt 0 ]];then
+                if [[ "${styles[$si]^^}" == "DASHED" && $need_skip -gt 0 ]];then
                     continue;
                 fi
                 case $si in
@@ -299,14 +301,13 @@ function calendarimg_generate {
 
     if [[ -z "$1" ]];then
         echo "lack of output filepath" >&2;
-        return
+        return 1
     fi
     if ! calendarimg_check_colors;then
-        return
+        return 1
     fi
 
     calendarimg_init
-
 
     local cur_index row_col_idx cur_row cur_col points row_start_idx col_start_idx w h i j col_counts row_counts color_idx data_total style color
     declare -A points
@@ -317,6 +318,46 @@ function calendarimg_generate {
     done
     declare -a col_counts
     declare -a row_counts
+    declare -a color_indices
+    local -i side_idx
+    local -a side_indices border_base_styles border_base_nodata_styles base_styles
+
+    IFS=' ' read -r -a border_base_styles <<< "$CALENDARIMG_BORDER_STYLE"
+    if [[ ${#border_base_styles[@]} -eq 1 ]];then
+        for ((i=1;i<4;i++));do
+            border_base_styles[i]="${border_base_styles[0]}"
+        done
+    elif [[ ${#border_base_styles[@]} -eq 2 ]];then
+        for ((i=0;i<2;i++));do
+            border_base_styles[i+2]="${border_base_styles[i]}"
+        done
+    fi
+
+    IFS=' ' read -r -a border_base_nodata_styles <<< "$CALENDARIMG_NODATA_BORDER_STYLE"
+    if [[ ${#border_base_nodata_styles[@]} -eq 1 ]];then
+        for ((i=1;i<4;i++));do
+            border_base_nodata_styles[i]="${border_base_nodata_styles[0]}"
+        done
+    elif [[ ${#border_base_nodata_styles[@]} -eq 2 ]];then
+        for ((i=0;i<2;i++));do
+            border_base_nodata_styles[i+2]="${border_base_nodata_styles[i]}"
+        done
+    fi
+
+
+    for ((cur_index=0;cur_index<CALENDARIMG_TOTAL;cur_index++));do
+        if [ ! ${CALENDARIMG_DATA[cur_index]+notexist} ];then
+            color_indices[cur_index]=-1
+            continue
+        fi
+        color_idx=0
+        for ((;color_idx<CALENDARIMG_LAST_LEVEL;color_idx++));do
+            if [[ "${CALENDARIMG_DATA[$cur_index]}" -lt ${CALENDARIMG_LEVEL_LIMITS[$color_idx]} ]];then
+                break;
+            fi
+        done
+        color_indices[cur_index]=$color_idx
+    done
 
     for ((i=0;i<CALENDARIMG_COLS;i++));do
         col_counts[i]=0
@@ -326,12 +367,12 @@ function calendarimg_generate {
     done
 
     for ((cur_index=0;cur_index<CALENDARIMG_TOTAL;cur_index++)); do
-        if [[ $CALENDARIMG_DATA_ORDER == "reversed" ]];then
+        if [[ ${CALENDARIMG_DATA_ORDER^^} == "REVERSED" ]];then
             row_col_idx=$((CALENDARIMG_TOTAL-1-cur_index))
         else
             row_col_idx=$cur_index
         fi
-        if [[ $CALENDARIMG_MAJOR == "row" ]];then
+        if [[ ${CALENDARIMG_MAJOR^^} == "ROW" ]];then
             cur_col=$((row_col_idx / CALENDARIMG_ROWS))
             cur_row=$((row_col_idx % CALENDARIMG_ROWS))
         else
@@ -340,7 +381,52 @@ function calendarimg_generate {
         fi
         row_start_idx=$((cur_row * CALENDARIMG_ITEM_WIDTH + CALENDARIMG_MARGIN))
         col_start_idx=$((cur_col * CALENDARIMG_ITEM_WIDTH + CALENDARIMG_MARGIN))
-        if [ ${CALENDARIMG_DATA[cur_index]+exist} ];then
+
+        color_idx=${color_indices[cur_index]}
+
+        if [[ "${CALENDARIMG_CONNECTED^^}" == "ENABLED" ]];then
+            if [[ ${CALENDARIMG_MAJOR^^} == "ROW" ]];then
+                side_indices[0]=$(( cur_index - 1 ))
+                side_indices[1]=$(( cur_index + CALENDARIMG_ROWS ))
+                side_indices[2]=$(( cur_index + 1 ))
+                side_indices[3]=$(( cur_index - CALENDARIMG_ROWS ))
+            else
+                side_indices[0]=$(( cur_index - CALENDARIMG_COLS ))
+                side_indices[1]=$(( cur_index + 1 ))
+                side_indices[2]=$(( cur_index + CALENDARIMG_COLS ))
+                side_indices[3]=$(( cur_index - 1 ))
+            fi
+            if [[ ${CALENDARIMG_DATA_ORDER^^} == "REVERSED" ]];then
+                for j in {0..3};do
+                    side_indices[j]=$(( CALENDARIMG_TOTAL-1-side_indices[j] ))
+                done
+            fi
+
+            if [[ $color_idx -ge 0 ]];then
+                IFS=' ' read -r -a base_styles <<< "${border_base_styles[@]}"
+                color="$CALENDARIMG_COLOR_BR"
+            else
+                IFS=' ' read -r -a base_styles <<< "${border_base_nodata_styles[@]}"
+                color="$CALENDARIMG_COLOR_NDBR"
+            fi
+            style=""
+            for j in {0..3};do
+                side_idx=${side_indices[j]}
+                if [[ $cur_row -eq 0 && $j -eq 0 ]];then
+                    style="${style}${base_styles[j]} "
+                elif [[ $cur_row -eq $(( CALENDARIMG_ROWS - 1 )) && $j -eq 2 ]];then
+                    style="${style}${base_styles[j]} "
+                elif [[ $cur_col -eq $(( CALENDARIMG_COLS - 1 )) && $j -eq 1 ]];then
+                    style="${style}${base_styles[j]} "
+                elif [[ $cur_col -eq 0 && $j -eq 3 ]];then
+                    style="${style}${base_styles[j]} "
+                elif [[ ${color_indices[side_idx]} -eq $color_idx ]];then
+                    style="${style}hidden "
+                else
+                    style="${style}${base_styles[j]} "
+                fi
+            done
+        elif [[ $color_idx -ge 0 ]];then
             style="$CALENDARIMG_BORDER_STYLE"
             color="$CALENDARIMG_COLOR_BR"
         else
@@ -349,7 +435,7 @@ function calendarimg_generate {
         fi
         eval "$(calendarimg_draw_border "$style" "$color" points $row_start_idx $col_start_idx)"
 
-        if [ ! ${CALENDARIMG_DATA[cur_index]+notexist} ];then
+        if [[ $color_idx -lt 0 ]];then
             continue
         fi
 
@@ -358,12 +444,6 @@ function calendarimg_generate {
             ((row_counts[cur_row]+=1))
         fi
 
-        color_idx=0
-        for ((;color_idx<CALENDARIMG_LAST_LEVEL;color_idx++));do
-            if [[ "${CALENDARIMG_DATA[$cur_index]}" -lt ${CALENDARIMG_LEVEL_LIMITS[$color_idx]} ]];then
-                break;
-            fi
-        done
 
         for ((i=0;i<CALENDARIMG_CELL_WIDTH;i++));do
             for ((j=0;j<CALENDARIMG_CELL_WIDTH;j++));do
