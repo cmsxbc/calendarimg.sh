@@ -207,3 +207,18 @@ done
 ```
 
 ![enable_connected](enable_connected.png)
+
+## Enable connected reversed
+
+```bash
+CALENDARIMG_CONNECTED=enabled
+CALENDARIMG_DATA_ORDER="reversed"
+for i in {0..362};do
+    if [[ $((i % 13)) -gt 7 ]];then
+        continue
+    fi
+    CALENDARIMG_DATA[i]=$(( i % 7));
+done
+```
+
+![enable_connected_reversed](enable_connected_reversed.png)

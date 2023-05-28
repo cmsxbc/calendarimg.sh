@@ -412,17 +412,17 @@ function calendarimg_generate {
             if [[ ${CALENDARIMG_MAJOR^^} == "ROW" ]];then
                 cur_col=$((row_col_idx / CALENDARIMG_ROWS))
                 cur_row=$((row_col_idx % CALENDARIMG_ROWS))
-                side_indices["$cur_index,0"]=$(( cur_index - 1 ))
-                side_indices["$cur_index,1"]=$(( cur_index + CALENDARIMG_ROWS ))
-                side_indices["$cur_index,2"]=$(( cur_index + 1 ))
-                side_indices["$cur_index,3"]=$(( cur_index - CALENDARIMG_ROWS ))
+                side_indices["$cur_index,0"]=$(( row_col_idx - 1 ))
+                side_indices["$cur_index,1"]=$(( row_col_idx + CALENDARIMG_ROWS ))
+                side_indices["$cur_index,2"]=$(( row_col_idx + 1 ))
+                side_indices["$cur_index,3"]=$(( row_col_idx - CALENDARIMG_ROWS ))
             else
                 cur_col=$((row_col_idx % CALENDARIMG_COLS))
                 cur_row=$((row_col_idx / CALENDARIMG_COLS))
-                side_indices["$cur_index,0"]=$(( cur_index - CALENDARIMG_COLS ))
-                side_indices["$cur_index,1"]=$(( cur_index + 1 ))
-                side_indices["$cur_index,2"]=$(( cur_index + CALENDARIMG_COLS ))
-                side_indices["$cur_index,3"]=$(( cur_index - 1 ))
+                side_indices["$cur_index,0"]=$(( row_col_idx - CALENDARIMG_COLS ))
+                side_indices["$cur_index,1"]=$(( row_col_idx + 1 ))
+                side_indices["$cur_index,2"]=$(( row_col_idx + CALENDARIMG_COLS ))
+                side_indices["$cur_index,3"]=$(( row_col_idx - 1 ))
             fi
             if [[ ${CALENDARIMG_DATA_ORDER^^} == "REVERSED" ]];then
                 for j in {0..3};do
