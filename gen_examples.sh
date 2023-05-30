@@ -213,9 +213,13 @@ function gen_readme_item {
 function gen_readme {
     echo "# calendarimg.sh Examples" > "$README_PATH"
     grep "^function config_" "$SELF_PATH" | awk '{print $2}' | cut -c8- | while read -r item; do
-        echo "deal $item ..."
+        local -i start_time end_time
+        echo -n "deal $item ..."
+        start_time=$(date +'%s')
         gen "$item"
+        end_time=$(date +'%s')
         gen_readme_item "$item" >> "$README_PATH"
+        echo " ... $((end_time - start_time)) s"
     done
 }
 

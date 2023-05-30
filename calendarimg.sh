@@ -504,7 +504,7 @@ function calendarimg_generate {
                 k=$(( (j + 3) % 4 ))
                 if [[ ${side_connected["$cur_index,$j"]} -gt 0 && ${side_connected["$cur_index,$k"]} -gt 0 ]];then
                     if [[ ${side_connected["${side_indices["$cur_index,$j"]},$k"]} -gt 0 && ${side_connected["${side_indices["$cur_index,$k"]},$j"]} -gt 0 ]];then
-                        if [[ $color_idx -gt 0 ]];then
+                        if [[ $color_idx -ge 0 ]];then
                             draw_corner="${draw_corner}1 "
                             corner_color="${corner_color}${CALENDARIMG_LEVEL_COLORS[color_idx]},"
                         else
