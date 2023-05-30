@@ -189,6 +189,15 @@ function config_enable_connected_reversed {
     done
 }
 
+function config_enable_connected_2 {
+    CALENDARIMG_CONNECTED=enabled
+    CALENDARIMG_ROWS=7
+    CALENDARIMG_COLS=7
+    for i in {0..31};do
+        CALENDARIMG_DATA[i]=$(( i % 7));
+    done
+}
+
 function gen_readme_item {
     local name name4human name4func
     name="$1"

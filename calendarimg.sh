@@ -498,25 +498,29 @@ function calendarimg_generate {
                     color="${color}${CALENDARIMG_LEVEL_COLORS[color_idx]},"
                 fi
             done
-            if [[ $color_idx -ge 0 ]];then
-                draw_corner=""
-                corner_color=""
-                for j in {0..3};do
-                    k=$(( (j + 3) % 4 ))
-                    if [[ ${side_connected["$cur_index,$j"]} -gt 0 && ${side_connected["$cur_index,$k"]} -gt 0 ]];then
-                        draw_corner="${draw_corner}1 "
-                        if [[ ${side_connected["${side_indices["$cur_index,$j"]},$k"]} -gt 0 && ${side_connected["${side_indices["$cur_index,$k"]},$j"]} -gt 0 ]];then
+            draw_corner=""
+            corner_color=""
+            for j in {0..3};do
+                k=$(( (j + 3) % 4 ))
+                if [[ ${side_connected["$cur_index,$j"]} -gt 0 && ${side_connected["$cur_index,$k"]} -gt 0 ]];then
+                    if [[ ${side_connected["${side_indices["$cur_index,$j"]},$k"]} -gt 0 && ${side_connected["${side_indices["$cur_index,$k"]},$j"]} -gt 0 ]];then
+                        if [[ $color_idx -gt 0 ]];then
+                            draw_corner="${draw_corner}1 "
                             corner_color="${corner_color}${CALENDARIMG_LEVEL_COLORS[color_idx]},"
                         else
+                            draw_corner="${draw_corner}0 "
                             corner_color="${corner_color}${base_color},"
                         fi
                     else
-                        draw_corner="${draw_corner}0 "
+                        draw_corner="${draw_corner}1 "
                         corner_color="${corner_color}${base_color},"
                     fi
-                done
-                draw_corner_prog="$(calendarimg_draw_corner "$draw_corner" "$corner_color" points $row_start_idx $col_start_idx)"
-            fi
+                else
+                    draw_corner="${draw_corner}0 "
+                    corner_color="${corner_color}${base_color},"
+                fi
+            done
+            draw_corner_prog="$(calendarimg_draw_corner "$draw_corner" "$corner_color" points $row_start_idx $col_start_idx)"
         elif [[ $color_idx -ge 0 ]];then
             style="$CALENDARIMG_BORDER_STYLE"
             color="$CALENDARIMG_COLOR_BR"

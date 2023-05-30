@@ -222,3 +222,16 @@ done
 ```
 
 ![enable_connected_reversed](enable_connected_reversed.png)
+
+## Enable connected 2
+
+```bash
+CALENDARIMG_CONNECTED=enabled
+CALENDARIMG_ROWS=7
+CALENDARIMG_COLS=7
+for i in {0..31};do
+    CALENDARIMG_DATA[i]=$(( i % 7));
+done
+```
+
+![enable_connected_2](enable_connected_2.png)
