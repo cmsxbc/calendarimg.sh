@@ -373,11 +373,6 @@ function calendarimg_generate {
 
     local cur_index row_col_idx cur_row cur_col points row_start_idx col_start_idx w h i j k col_counts row_counts color_idx data_total style color
     declare -A points
-    for ((h=0;h<CALENDARIMG_TOTAL_HEIGTH;h++));do
-        for ((w=0;w<CALENDARIMG_TOTAL_WIDTH;w++));do
-            points["$h,$w"]="$CALENDARIMG_COLOR_BG"
-        done
-    done
     declare -a col_counts
     declare -a row_counts
     declare -a color_indices
@@ -560,7 +555,11 @@ function calendarimg_generate {
     echo -e "P3\n${CALENDARIMG_TOTAL_WIDTH} ${CALENDARIMG_TOTAL_HEIGTH}\n255\n" > "$1"
     for ((h=0;h<CALENDARIMG_TOTAL_HEIGTH;h++));do
         for ((w=0;w<CALENDARIMG_TOTAL_WIDTH;w++));do
-            echo "${points["$h,$w"]}" >> "$1"
+            if [ ${points["$h,$w"]+exist} ];then
+                echo "${points["$h,$w"]}" >> "$1"
+            else
+                echo "$CALENDARIMG_COLOR_BG" >> "$1"
+            fi
         done
     done
 }
