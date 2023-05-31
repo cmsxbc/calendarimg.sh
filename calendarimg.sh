@@ -186,65 +186,65 @@ end
 
 
 function calendarimg_draw_border {
-
-    local i j i_end k l row_start_idx1 col_start_idx1 si
+    local -i i j i_end k l row_start_idx1 col_start_idx1 si row1 row2 col1 col2
     ((row_start_idx1=row_start_idx+CALENDARIMG_CELL_WIDTH+CALENDARIMG_BORDER*2-1))
     ((col_start_idx1=col_start_idx+CALENDARIMG_CELL_WIDTH+CALENDARIMG_BORDER*2-1))
     ((i_end=CALENDARIMG_CELL_WIDTH/2+CALENDARIMG_BORDER+1))
-    for ((si=0;si<4;si++));do
-        if [[ "${border_styles[si]}" == "HIDDEN" ]];then
-            continue
+    local edge_is dashed_is normal_is is_name
+    for ((i=0;i<i_end;i++));do
+        if [[ $(( (i / CALENDARIMG_BORDER) % 2 )) -eq 0 ]];then
+            dashed_is+="$i "
         fi
+        if [[ $i -ge $CALENDARIMG_BORDER ]];then
+            edge_is+="$i "
+        fi
+        normal_is+="$i "
+    done
+    for ((si=0;si<4;si++));do
+        case "${border_styles[si]}" in
+            HIDDEN )
+                continue;;
+            DASHED )
+                is_name=dashed_is;;
+            EDGE )
+                is_name=edge_is;;
+            * )
+                is_name=normal_is;;
+        esac
         case $si in
             0 )
-                for ((i=0;i<i_end;i++));do
-                    if [[ "${border_styles[$si]}" == "DASHED" && $(( (i / CALENDARIMG_BORDER) % 2 )) -gt 0 ]];then
-                        continue;
-                    elif [[ "${border_styles[$si]}" == "EDGE" && $i -lt $CALENDARIMG_BORDER ]];then
-                        continue;
-                    fi
-                    for ((j=0;j<CALENDARIMG_BORDER;j++));do
-                        points["$((row_start_idx+j)),$((col_start_idx+i))"]="${border_colors[si]}"
-                        points["$((row_start_idx+j)),$((col_start_idx1-i))"]="${border_colors[si]}"
+                for i in ${!is_name};do
+                    ((col1=col_start_idx+i,col2=col_start_idx1-i))
+                    for ((j=0,row1=row_start_idx;j<CALENDARIMG_BORDER;j++,row1++));do
+                        points["$row1,$col1"]="${border_colors[si]}"
+                        points["$row1,$col2"]="${border_colors[si]}"
                     done
                 done
                 ;;
             1 )
-                for ((i=0;i<i_end;i++));do
-                    if [[ "${border_styles[$si]}" == "DASHED" && $(( (i / CALENDARIMG_BORDER) % 2 )) -gt 0 ]];then
-                        continue;
-                    elif [[ "${border_styles[$si]}" == "EDGE" && $i -lt $CALENDARIMG_BORDER ]];then
-                        continue;
-                    fi
-                    for ((j=0;j<CALENDARIMG_BORDER;j++));do
-                        points["$((row_start_idx+i)),$((col_start_idx1-j))"]="${border_colors[si]}"
-                        points["$((row_start_idx1-i)),$((col_start_idx1-j))"]="${border_colors[si]}"
+                for i in ${!is_name};do
+                    ((row1=row_start_idx+i,row2=row_start_idx1-i))
+                    for ((j=0,col1=col_start_idx1;j<CALENDARIMG_BORDER;j++,col1--));do
+                        points["$row1,$col1"]="${border_colors[si]}"
+                        points["$row2,$col1"]="${border_colors[si]}"
                     done
                 done
                 ;;
             2 )
-                for ((i=0;i<i_end;i++));do
-                    if [[ "${border_styles[$si]}" == "DASHED" && $(( (i / CALENDARIMG_BORDER) % 2 )) -gt 0 ]];then
-                        continue;
-                    elif [[ "${border_styles[$si]}" == "EDGE" && $i -lt $CALENDARIMG_BORDER ]];then
-                        continue;
-                    fi
-                    for ((j=0;j<CALENDARIMG_BORDER;j++));do
-                        points["$((row_start_idx1-j)),$((col_start_idx+i))"]="${border_colors[si]}"
-                        points["$((row_start_idx1-j)),$((col_start_idx1-i))"]="${border_colors[si]}"
+                for i in ${!is_name};do
+                    ((col1=col_start_idx+i,col2=col_start_idx1-i))
+                    for ((j=0,row1=row_start_idx1;j<CALENDARIMG_BORDER;j++,row1--));do
+                        points["$row1,$col1"]="${border_colors[si]}"
+                        points["$row1,$col2"]="${border_colors[si]}"
                     done
                 done
                 ;;
             3 )
-                for ((i=0;i<i_end;i++));do
-                    if [[ "${border_styles[$si]}" == "DASHED" && $(( (i / CALENDARIMG_BORDER) % 2 )) -gt 0 ]];then
-                        continue;
-                    elif [[ "${border_styles[$si]}" == "EDGE" && $i -lt $CALENDARIMG_BORDER ]];then
-                        continue;
-                    fi
-                    for ((j=0;j<CALENDARIMG_BORDER;j++));do
-                        points["$((row_start_idx+i)),$((col_start_idx+j))"]="${border_colors[si]}"
-                        points["$((row_start_idx1-i)),$((col_start_idx+j))"]="${border_colors[si]}"
+                for i in ${!is_name};do
+                    ((row1=row_start_idx+i,row2=row_start_idx1-i))
+                    for ((j=0,col1=col_start_idx;j<CALENDARIMG_BORDER;j++,col1++));do
+                        points["$row1,$col1"]="${border_colors[si]}"
+                        points["$row2,$col1"]="${border_colors[si]}"
                     done
                 done
                 ;;
