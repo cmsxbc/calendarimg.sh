@@ -549,11 +549,7 @@ function calendarimg_gen_points {
     echo -e "P3\n${CALENDARIMG_TOTAL_WIDTH} ${CALENDARIMG_TOTAL_HEIGTH}\n255\n"
     for ((h=0;h<CALENDARIMG_TOTAL_HEIGTH;h++));do
         for ((w=0;w<CALENDARIMG_TOTAL_WIDTH;w++));do
-            if [ ${points["$h,$w"]+exist} ];then
-                echo "${points["$h,$w"]}"
-            else
-                echo "$CALENDARIMG_COLOR_BG"
-            fi
+            echo "${points["$h,$w"]:-$CALENDARIMG_COLOR_BG}"
         done
     done
 }
